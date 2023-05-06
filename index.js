@@ -1,13 +1,18 @@
 // Criando um servidor
 
+
 // Configurações do servidor, declaração do framework e ferramentas
 const express = require('express')
 const app = express()
-const port = 3000
+let cors = require('cors')
+
+const port = 3001
 const uuid = require('uuid')
 const bodyParser = require('body-parser')
 const { request } = require('express')
 app.use(bodyParser.json())
+app.use(cors())
+
 
 const users = []
 
@@ -44,13 +49,21 @@ app.listen(port, () => {
 // Rota para criar as informações no Back-end
 
 app.post('/users', (request, response) => {
+try {
     const { name, age } = request.body
+
+    if(age < 18 ) throw new Error("Only allowed users over 18 years old") // criando um erro pra cair no catch
 
     const user = { id: uuid.v4(), name, age }
 
     users.push(user)
 
     return response.status(201).json(user)
+}catch(err){
+    return response.status(400).json({error: "Error user"})
+} finally {
+    console.log("Terminou tudo")
+}
 })
 
 // Rota para atualizar as informações do usuário, vamos busca=lo através do id, realizando uma pesquisa específica
